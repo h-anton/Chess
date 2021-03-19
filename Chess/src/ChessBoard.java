@@ -21,10 +21,6 @@ import javax.swing.*;
 
 @SuppressWarnings("serial")
 public class ChessBoard extends JPanel {
-	static ArrayList<Square> squares;
-
-	static int x_coordinate, y_coordinate, list_coordinate;
-	
 	static String[][] chess_coordinates = {	{"A8", "A7", "A6", "A5", "A4", "A3", "A2", "A1"},
 											{"B8", "B7", "B6", "B5", "B4", "B3", "B2", "B1"},
 											{"C8", "C7", "C6", "C5", "C4", "C3", "C2", "C1"},
@@ -52,6 +48,7 @@ public class ChessBoard extends JPanel {
 	
 	static int selected_square = -1;
 	
+	static ArrayList<Square> squares;
 	static ArrayList<Piece> white_pieces;
 	static ArrayList<Piece> black_pieces;
 	
@@ -68,21 +65,21 @@ public class ChessBoard extends JPanel {
 		black_pieces = new ArrayList<Piece>();
 		
 		for (int i = 0; i < 8; i++) {
-			white_pieces.add(new Pawn("white",8+i));
-			black_pieces.add(new Pawn("black", 48+i));
+			white_pieces.add(new Pawn	("white",	8+i));
+			black_pieces.add(new Pawn	("black",	48+i));
 		}
 		for (int i = 0; i < 2; i++) {
-			white_pieces.add(new Rook("white", 7*i));
-			white_pieces.add(new Bishop("white", 1+5*i));
-			white_pieces.add(new Knight("white", 2+3*i));
-			black_pieces.add(new Rook("black", 56+7*i));
-			black_pieces.add(new Knight("black", 57+5*i));
-			black_pieces.add(new Bishop("black", 58+3*i));
+			white_pieces.add(new Rook	("white",	7*i));
+			white_pieces.add(new Bishop	("white",	1+5*i));
+			white_pieces.add(new Knight	("white",	2+3*i));
+			black_pieces.add(new Rook	("black",	56+7*i));
+			black_pieces.add(new Knight	("black",	57+5*i));
+			black_pieces.add(new Bishop	("black",	58+3*i));
 		}
-		white_pieces.add(new Queen("white", 3));
-		white_pieces.add(new King("white", 4));
-		black_pieces.add(new Queen("black", 59));
-		black_pieces.add(new King("black", 60));
+		white_pieces.add(new Queen	("white",	3));
+		white_pieces.add(new King	("white",	4));
+		black_pieces.add(new Queen	("black",	59));
+		black_pieces.add(new King	("black",	60));
 		
 		
 	}
@@ -131,8 +128,8 @@ public class ChessBoard extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
-				x_coordinate = (int)e.getX()/squareSize();
-				y_coordinate = (int)(e.getY()-title_offset)/squareSize();
+				int x_coordinate = (int)e.getX()/squareSize();
+				int y_coordinate = (int)(e.getY()-title_offset)/squareSize();
 				int new_selection = list_coordinates[x_coordinate][y_coordinate];
 				/*if (selected_square != -1) {	// if a piece is selected
 					changeColor(draw_coordinates[selected_square]);
