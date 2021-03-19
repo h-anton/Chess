@@ -7,12 +7,22 @@ import java.util.*;
 
 import javax.swing.*;
 
+/*	XMPP Domain name: DESKTOP-U9BO5EO.lan
+ * 	Server Host Name: DESKTOP-U9BO5EO.lan
+ *	Admin console port: 9090
+ * 	Secure Admin console port: 9091
+ * 
+ * 	Database Driver Presets: Microsoft SQL Server (legacy)
+ * 	JDBC Driver Class:	net.sourceforge.jtds.jdbc.Driver
+ * 	Database URL:	jdbc:jtds:sqlserver://HOSTNAME/DATABASENAME;appName=Openfire
+ */
+
+
+
 @SuppressWarnings("serial")
 public class ChessBoard extends JPanel {
 	static ArrayList<Square> squares;
-	static Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
-	static int square_size = (int)(screen_size.height/12);
-	static int title_offset;
+
 	static int x_coordinate, y_coordinate, list_coordinate;
 	
 	static String[][] chess_coordinates = {	{"A8", "A7", "A6", "A5", "A4", "A3", "A2", "A1"},
@@ -40,69 +50,41 @@ public class ChessBoard extends JPanel {
 									1,	9,	17,	25,	33,	41,	49,	57,
 									0,	8,	16,	24,	32,	40,	48,	56};
 	
-	ArrayList<Piece> field;
+	static int selected_square = -1;
 	
-	ArrayList<Piece> white_pieces;
-	ArrayList<Piece> black_pieces;
-	int[] pawnWhite_possibleMoves = {7, 8, 9, 16};
-	int[] pawnBlack_possibleMoves = {-7, -8, -9, -16};
-	int[] rook_possibleMoves = {-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, -8, -16, -24, -32, -40, -48, -56, 8, 16, 24, 32, 40, 48, 56};
-	int[] knight_possibleMoves = {-17, -15, -10, -6, 6, 10, 15, 17};
-	int[] bishop_possibleMoves = {-63, -54, -49, -45, -42, -36, -35, -28, -27, -21, -18, -12, -9, -3, 3, 9, 12, 18, 21, 27, 28, 35, 36, 42, 45, 49, 54, 63};
-	int[] queen_possibleMoves = new int[rook_possibleMoves.length + bishop_possibleMoves.length];
-	int[] king_possibleMoves = {-9, -8, -7, -1, 1, 7, 8, 9};
-	/********************************
-	 ******		CONSTRAINTS		*****
-	 ********************************
-	 * 	0: new coordinate should be empty
-	 * 	1: new coordinate should be taken by other colours piece
-	 * 	2: all horizontal squares between old and new coordinate should be empty
-	 * 	3: all vertical squares between old and new coordinate should be empty
-	 * 	4: all diagonal squares between old and new coordinate should be empty
-	 * 	5: piece may never have moved before and constraint 3
-	 * 	6: None
-	 */
-	int[] pawn_constraints = {1, 0, 1, 5};
-	int[] rook_constraints = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
-	int[] knight_constraints = {6, 6, 6, 6, 6, 6, 6, 6};
-	int[] bishop_constraints = {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4};
-	int[] queen_constraints = new int[rook_constraints.length + bishop_constraints.length];
-	int[] king_constraints = {6, 6, 6, 6, 6, 6, 6, 6};
-	
+	static ArrayList<Piece> white_pieces;
+	static ArrayList<Piece> black_pieces;
 	
 	
 	public ChessBoard() {
 		squares = new ArrayList<Square>();
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
-				squares.add(new Square(i, j, square_size));
+				squares.add(new Square(i, j));
 			}
 		}
 		
 		white_pieces = new ArrayList<Piece>();
 		black_pieces = new ArrayList<Piece>();
 		
-		System.arraycopy(rook_possibleMoves, 0, queen_possibleMoves, 0, rook_possibleMoves.length);
-		System.arraycopy(bishop_possibleMoves, 0, queen_possibleMoves, rook_possibleMoves.length, bishop_possibleMoves.length);
-		System.arraycopy(rook_constraints, 0, queen_constraints, 0, rook_constraints.length);
-		System.arraycopy(bishop_constraints, 0, queen_constraints, rook_constraints.length, bishop_constraints.length);
 		for (int i = 0; i < 8; i++) {
-			white_pieces.add(new Piece(pawnWhite_possibleMoves,	pawn_constraints,		i,		1,	square_size,	"white_pawn"));
-			black_pieces.add(new Piece(pawnBlack_possibleMoves, pawn_constraints,		i,		6,	square_size,	"black_pawn"));
-			
+			white_pieces.add(new Pawn("white",8+i));
+			black_pieces.add(new Pawn("black", 48+i));
 		}
 		for (int i = 0; i < 2; i++) {
-			white_pieces.add(new Piece(rook_possibleMoves,		rook_constraints,		7*i,	0,	square_size,	"white_rook"));
-			white_pieces.add(new Piece(knight_possibleMoves,	knight_constraints,		5*i+1,	0,	square_size,	"white_knight"));
-			white_pieces.add(new Piece(bishop_possibleMoves,	bishop_constraints,		3*i+2,	0,	square_size,	"white_bishop"));
-			black_pieces.add(new Piece(rook_possibleMoves,		rook_constraints,		7*i,	7,	square_size,	"black_rook"));
-			black_pieces.add(new Piece(knight_possibleMoves,	knight_constraints,		5*i+1,	7,	square_size,	"black_knight"));
-			black_pieces.add(new Piece(bishop_possibleMoves,	bishop_constraints,		3*i+2,	7,	square_size,	"black_bishop"));
+			white_pieces.add(new Rook("white", 7*i));
+			white_pieces.add(new Bishop("white", 1+5*i));
+			white_pieces.add(new Knight("white", 2+3*i));
+			black_pieces.add(new Rook("black", 56+7*i));
+			black_pieces.add(new Knight("black", 57+5*i));
+			black_pieces.add(new Bishop("black", 58+3*i));
 		}
-		white_pieces.add(new Piece(queen_possibleMoves,	queen_constraints,	3, 0,	square_size,	"white_queen"));
-		white_pieces.add(new Piece(king_possibleMoves,	king_constraints,	4, 0,	square_size,	"white_king"));
-		black_pieces.add(new Piece(queen_possibleMoves,	queen_constraints,	3, 7,	square_size,	"black_queen"));
-		black_pieces.add(new Piece(king_possibleMoves,	king_constraints,	4, 7,	square_size,	"black_king"));
+		white_pieces.add(new Queen("white", 3));
+		white_pieces.add(new King("white", 4));
+		black_pieces.add(new Queen("black", 59));
+		black_pieces.add(new King("black", 60));
+		
+		
 	}
 
 	@Override
@@ -129,16 +111,16 @@ public class ChessBoard extends JPanel {
 
 	public static void main(String[] args) {
 		JFrame f = new JFrame();
-		f.getContentPane().setPreferredSize(new Dimension(square_size*8-1, square_size*8-1));
+		f.getContentPane().setPreferredSize(new Dimension(squareSize()*8, squareSize()*8));
 		f.setResizable(false);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setTitle("Chessboard");
-		f.setLocation((int)(screen_size.width-square_size*8)/2, (int)(screen_size.height-square_size*8)/2);
+		f.setLocation((int)(screenSize().width-squareSize()*8)/2, (int)(screenSize().height-squareSize()*8)/2);
 		JPanel hoofdpaneel = new ChessBoard();
 		f.add(hoofdpaneel);
 		f.pack();
 		f.setVisible(true);
-		title_offset = f.getSize().height - (square_size*8-1);
+		int title_offset = f.getSize().height - (squareSize()*8-1);
 		f.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -149,11 +131,19 @@ public class ChessBoard extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
-				x_coordinate = (int)e.getX()/square_size;
-				y_coordinate = (int)(e.getY()-title_offset)/square_size;
-				System.out.println("Mouse pressed: chess coordinates = " + chess_coordinates[x_coordinate][y_coordinate] + "   list coordinates = " + String.valueOf(list_coordinates[x_coordinate][y_coordinate]));
-				changeColor(draw_coordinates[list_coordinates[x_coordinate][y_coordinate]]);
-				f.repaint();
+				x_coordinate = (int)e.getX()/squareSize();
+				y_coordinate = (int)(e.getY()-title_offset)/squareSize();
+				int new_selection = list_coordinates[x_coordinate][y_coordinate];
+				/*if (selected_square != -1) {	// if a piece is selected
+					changeColor(draw_coordinates[selected_square]);
+				}*/
+				if (getPiece(new_selection) != null) {
+					selected_square = new_selection;
+					System.out.println("Mouse pressed: chess coordinates = " + chess_coordinates[x_coordinate][y_coordinate] + "   list coordinates = " + String.valueOf(selected_square));
+					changeColor(draw_coordinates[selected_square]);
+					f.repaint();
+				}
+				
 			}
 
 			@Override
@@ -175,14 +165,28 @@ public class ChessBoard extends JPanel {
 		});
 	}
 	
-	/*public ArrayList<Boolean> legalMoves(Piece piece) {
-		ArrayList<Boolean> moves = new ArrayList<Boolean>();
-		for (int i = 0; i < piece.possibleMoves.length; i++) {
-			
+	public static Dimension screenSize() {
+		return Toolkit.getDefaultToolkit().getScreenSize();
+	}
+	
+	public static int squareSize() {
+		return (int)screenSize().height/12;
+	}
+	
+	public static Piece getPiece(int coordinate) {
+		Piece result = null;
+		for (Piece piece : white_pieces) {
+			if (piece.coordinate == coordinate) {
+				result = piece;
+			}
 		}
-		
-		
-		return moves;
-	}*/
+		for (Piece piece : black_pieces) {
+			if (piece.coordinate == coordinate) {
+				result = piece;
+			}
+		}
+		return result;
+	}
+
 	
 }

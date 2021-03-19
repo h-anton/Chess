@@ -5,21 +5,21 @@ public class Square {
 	int start_x, start_y;
 	int square_size;
 	Color color, square_color;
-	Color click_color = new Color(255, 0, 0);
+	Color click_color = new Color(212, 205, 11);
 	
 	//boolean selected = false;
 	
-	public Square(int x, int y, int size) {
+	public Square(int x, int y) {
 		// constructor
-		start_x = x*size;
-		start_y = y*size;
-		square_size = size;
+		start_x = x*ChessBoard.squareSize();
+		start_y = y*ChessBoard.squareSize();
+		square_size = ChessBoard.squareSize();
 		if ((x+y)%2 == 0) {
 			// Color of the white squares
-			square_color = new Color(200, 200, 200);
+			square_color = new Color(209, 192, 148);
 		} else {
 			// Color of the black squares
-			square_color = new Color(0, 0, 0);
+			square_color = new Color(110, 83, 43);
 		}
 		color = square_color;
 
