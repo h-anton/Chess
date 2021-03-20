@@ -32,5 +32,6 @@ public class Piece {
 	
 	public void draw(Graphics g) {
 		g.drawImage(image, co_x_draw(), co_y_draw(), piece_size, piece_size, null);
+		//System.out.println("drawn");
 	}
 }
