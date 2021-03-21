@@ -1,6 +1,6 @@
 import java.awt.Toolkit;
 
-public class Knight extends Piece {
+public class BlackPawn extends Piece {
 	/********************************
 	 ******		CONSTRAINTS		*****
 	 ********************************
@@ -12,11 +12,11 @@ public class Knight extends Piece {
 	 * 	5: piece may never have moved before and constraint 3
 	 * 	6: None
 	 */
-	static int[] possibleMoves	=	{-17, -15, -10, -6, 6, 10, 15, 17};
-	static int[] constraints	=	{6, 6, 6, 6, 6, 6, 6, 6};
+	static int[] possibleMoves	=	{-7, -8, -9, -16};
+	static int[] constraints	=	{1, 0, 1, 5};
 	
-	public Knight(String color, int coordinate) {
+	public BlackPawn(String color, int coordinate) {
 		super(color, coordinate, possibleMoves, constraints);
-		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_knight.png");
+		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_pawn.png");
 	}
 }

@@ -12,11 +12,11 @@ public class King extends Piece {
 	 * 	5: piece may never have moved before and constraint 3
 	 * 	6: None
 	 */
-	int[] possibleMoves	=	{-9, -8, -7, -1, 1, 7, 8, 9};
-	int[] constraints	=	{6, 6, 6, 6, 6, 6, 6, 6};
+	static int[] possibleMoves	=	{-9, -8, -7, -1, 1, 7, 8, 9};
+	static int[] constraints	=	{6, 6, 6, 6, 6, 6, 6, 6};
 	
 	public King(String color, int coordinate) {
-		super(color, coordinate);
+		super(color, coordinate, possibleMoves, constraints);
 		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_king.png");
 	}
 }

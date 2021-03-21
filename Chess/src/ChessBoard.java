@@ -8,8 +8,15 @@ import java.util.*;
 
 import javax.swing.*;
 
-import com.sun.tools.javac.Main;
-
+/*	XMPP Domain name: DESKTOP-U9BO5EO.lan
+ * 	Server Host Name: DESKTOP-U9BO5EO.lan
+ *	Admin console port: 9090
+ * 	Secure Admin console port: 9091
+ * 
+ * 	Database Driver Presets: Microsoft SQL Server (legacy)
+ * 	JDBC Driver Class:	net.sourceforge.jtds.jdbc.Driver
+ * 	Database URL:	jdbc:jtds:sqlserver://HOSTNAME/DATABASENAME;appName=Openfire
+ */
 
 @SuppressWarnings("serial")
 public class ChessBoard extends JPanel {
@@ -38,16 +45,12 @@ public class ChessBoard extends JPanel {
 									1,	9,	17,	25,	33,	41,	49,	57,
 									0,	8,	16,	24,	32,	40,	48,	56};
 	
-	ArrayList<Square> squares;
-	ArrayList<Piece> white_pieces;
-	ArrayList<Piece> black_pieces;
+	ArrayList<Square> squares = new ArrayList<Square>();
+	static ArrayList<Piece> white_pieces = new ArrayList<Piece>();
+	static ArrayList<Piece> black_pieces = new ArrayList<Piece>();
 		
 	
 	public ChessBoard() {
-		squares = new ArrayList<Square>();
-		white_pieces = new ArrayList<Piece>();
-		black_pieces = new ArrayList<Piece>();
-		
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				squares.add(new Square(i, j));
@@ -55,8 +58,8 @@ public class ChessBoard extends JPanel {
 		}
 		
 		for (int i = 0; i < 8; i++) {
-			white_pieces.add(new Pawn	("white",	8+i));
-			black_pieces.add(new Pawn	("black",	48+i));
+			white_pieces.add(new WhitePawn	("white",	8+i));
+			black_pieces.add(new BlackPawn	("black",	48+i));
 		}
 		for (int i = 0; i < 2; i++) {
 			white_pieces.add(new Rook	("white",	7*i));
@@ -70,31 +73,38 @@ public class ChessBoard extends JPanel {
 		white_pieces.add(new King	("white",	4));
 		black_pieces.add(new Queen	("black",	59));
 		black_pieces.add(new King	("black",	60));
-		System.out.println("pieces created");
 	}
 
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		System.out.println("squares size: " + String.valueOf(squares.size()));
-		System.out.println("white_pieces size: " + String.valueOf(white_pieces.size()));
-		System.out.println("black_pieces size: " + String.valueOf(black_pieces.size()));
 		for (Square square : squares) {
 			square.draw(g);
 		}
 		for (Piece piece : white_pieces) {
-			piece.draw(g);
+			piece.draw(g, this);
 		}
 		for (Piece piece : black_pieces) {
-			piece.draw(g);
+			piece.draw(g, this);
 		}
 	}
 	
 	public void changeColor(int coordinate) {
 		if (squares.get(coordinate).color == squares.get(coordinate).click_color) {
 			squares.get(coordinate).color = squares.get(coordinate).square_color;
+		} else if (squares.get(coordinate).color == squares.get(coordinate).possibleMoves_color) {
+			for (Square square : squares) {
+				square.color = square.square_color;
+			}
 		} else {
 			squares.get(coordinate).color = squares.get(coordinate).click_color;
+		}
+	}
+	
+	public void showLegalMoves(Piece piece) {
+		//System.out.println("legal moves: " + piece.legalMoves().toString());
+		for (int legalMove : piece.legalMoves()) {
+			squares.get(draw_coordinates[piece.coordinate+legalMove]).color = squares.get(draw_coordinates[piece.coordinate+legalMove]).possibleMoves_color;
 		}
 	}
 
@@ -115,6 +125,9 @@ public class ChessBoard extends JPanel {
 		int title_offset = f.getSize().height - (squareSize()*8-1);
 		f.addMouseListener(new MouseListener() {
 			int selected_square = -1;
+			int new_selection = -1;
+			int x_coordinate, y_coordinate;
+			String turn = "white";
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
@@ -124,19 +137,37 @@ public class ChessBoard extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
-				int x_coordinate = (int)e.getX()/squareSize();
-				int y_coordinate = (int)(e.getY()-title_offset)/squareSize();
-				int new_selection = list_coordinates[x_coordinate][y_coordinate];
-				/*if (selected_square != -1) {	// if a piece is selected
-					changeColor(draw_coordinates[selected_square]);
-				}*/
-				if (getPiece(new_selection) != null) {
-					selected_square = new_selection;
-					System.out.println("Mouse pressed: chess coordinates = " + chess_coordinates[x_coordinate][y_coordinate] + "   list coordinates = " + String.valueOf(selected_square));
-					changeColor(draw_coordinates[selected_square]);
-					f.repaint();
+				x_coordinate = (int)e.getX()/squareSize();
+				y_coordinate = (int)(e.getY()-title_offset)/squareSize();
+				new_selection = list_coordinates[x_coordinate][y_coordinate];
+
+				if (getPiece(new_selection) != null && selected_square == -1) { // select a piece
+					if (getPiece(new_selection).color == turn) {
+						selected_square = new_selection;
+						System.out.println("Mouse pressed: chess coordinates = " + chess_coordinates[x_coordinate][y_coordinate] + "   list coordinates = " + String.valueOf(selected_square));
+						changeColor(draw_coordinates[selected_square]);
+						showLegalMoves(getPiece(selected_square));
+					}
+					
+				} else if (selected_square != -1) { // move a piece
+					if (getPiece(selected_square).legalMoves().contains(new_selection-selected_square)) {
+						if (getPiece(new_selection) != null && getPiece(selected_square).color != getPiece(new_selection).color) { // taking a piece
+							//getPiece(new_selection).isAlive = false;
+							deletePiece(new_selection);
+						}
+						getPiece(selected_square).move(new_selection);
+						getPiece(new_selection).hasMoved = true;
+						changeColor(draw_coordinates[selected_square]);
+						changeColor(draw_coordinates[new_selection]);
+						selected_square = -1;
+						if (turn == "white") {
+							turn = "black";
+						} else {
+							turn = "white";
+						}
+					}
 				}
-				
+				f.repaint();
 			}
 
 			@Override
@@ -166,7 +197,7 @@ public class ChessBoard extends JPanel {
 		return (int)screenSize().height/12;
 	}
 	
-	public Piece getPiece(int coordinate) {
+	public static Piece getPiece(int coordinate) {
 		Piece result = null;
 		for (Piece piece : white_pieces) {
 			if (piece.coordinate == coordinate) {
@@ -179,5 +210,18 @@ public class ChessBoard extends JPanel {
 			}
 		}
 		return result;
+	}
+	
+	public void deletePiece(int coordinate) {
+		for (int i = 0; i < white_pieces.size(); i++) {
+			if (white_pieces.get(i).coordinate == coordinate) {
+				white_pieces.remove(i);
+			}
+		}
+		for (int i = 0; i < black_pieces.size(); i++) {
+			if (black_pieces.get(i).coordinate == coordinate) {
+				black_pieces.remove(i);
+			}
+		}
 	}
 }

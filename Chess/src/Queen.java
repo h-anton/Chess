@@ -12,11 +12,15 @@ public class Queen extends Piece {
 	 * 	5: piece may never have moved before and constraint 3
 	 * 	6: None
 	 */
-	int[] possibleMoves	=	{-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, -8, -16, -24, -32, -40, -48, -56, 8, 16, 24, 32, 40, 48, 56, -63, -54, -49, -45, -42, -36, -35, -28, -27, -21, -18, -12, -9, -3, 3, 9, 12, 18, 21, 27, 28, 35, 36, 42, 45, 49, 54, 63};
-	int[] constraints	=	{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4};
+	static int[] possibleMoves	=	{-63, -54, -45, -36, -27, -18, -9,	// going down and to the right:	index 0 to 6
+									9, 18, 27, 36, 45, 54, 63,			// going up and to the right:	index 7 to 13
+									-49, -42, -35, -28, -21, -14, -7,	// going down and to the left:	index 14 to 20
+									7, 14, 21, 28, 35, 42, 49, 			// going up and to the left:	index 21 to 27
+									-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, -8, -16, -24, -32, -40, -48, -56, 8, 16, 24, 32, 40, 48, 56};
+	static int[] constraints	=	{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
 	
 	public Queen(String color, int coordinate) {
-		super(color, coordinate);
+		super(color, coordinate, possibleMoves, constraints);
 		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_queen.png");
 	}
 }

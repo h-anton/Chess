@@ -6,6 +6,7 @@ public class Square {
 	int square_size;
 	Color color, square_color;
 	Color click_color = new Color(212, 205, 11);
+	Color possibleMoves_color = new Color(0, 205, 11);
 	
 	//boolean selected = false;
 	
