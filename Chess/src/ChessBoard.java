@@ -63,8 +63,8 @@ public class ChessBoard extends JPanel {
 		}
 		for (int i = 0; i < 2; i++) {
 			white_pieces.add(new Rook	("white",	7*i));
-			white_pieces.add(new Bishop	("white",	1+5*i));
-			white_pieces.add(new Knight	("white",	2+3*i));
+			white_pieces.add(new Bishop	("white",	2+3*i));
+			white_pieces.add(new Knight	("white",	1+5*i));
 			black_pieces.add(new Rook	("black",	56+7*i));
 			black_pieces.add(new Knight	("black",	57+5*i));
 			black_pieces.add(new Bishop	("black",	58+3*i));
@@ -142,11 +142,13 @@ public class ChessBoard extends JPanel {
 				new_selection = list_coordinates[x_coordinate][y_coordinate];
 
 				if (getPiece(new_selection) != null && selected_square == -1) { // select a piece
-					if (getPiece(new_selection).color == turn) {
-						selected_square = new_selection;
-						System.out.println("Mouse pressed: chess coordinates = " + chess_coordinates[x_coordinate][y_coordinate] + "   list coordinates = " + String.valueOf(selected_square));
-						changeColor(draw_coordinates[selected_square]);
-						showLegalMoves(getPiece(selected_square));
+					if (!getPiece(new_selection).legalMoves().isEmpty()) {
+						if (getPiece(new_selection).color == turn) {
+							selected_square = new_selection;
+							System.out.println("Mouse pressed: chess coordinates = " + chess_coordinates[x_coordinate][y_coordinate] + "   list coordinates = " + String.valueOf(selected_square));
+							changeColor(draw_coordinates[selected_square]);
+							showLegalMoves(getPiece(selected_square));
+						}
 					}
 					
 				} else if (selected_square != -1) { // move a piece
@@ -222,6 +224,14 @@ public class ChessBoard extends JPanel {
 			if (black_pieces.get(i).coordinate == coordinate) {
 				black_pieces.remove(i);
 			}
+		}
+	}
+	
+	public static int kingCoordinate(String color) {
+		if (color == "white") {
+			return ChessBoard.white_pieces.get(-1).coordinate;
+		} else {
+			return ChessBoard.black_pieces.get(-1).coordinate;
 		}
 	}
 }

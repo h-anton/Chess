@@ -74,6 +74,10 @@ public class Piece {
 						for(int j = 1; j < Math.abs(co_x_board(coordinate)-co_x_board(coordinate+possibleMoves[i]))+1; j++) {
 							if (ChessBoard.getPiece(coordinate+j*Math.abs(possibleMoves[i])/possibleMoves[i]) != null) {
 								empty = false;
+								if (j == Math.abs(co_x_board(coordinate)-co_x_board(coordinate+possibleMoves[i])) && ChessBoard.getPiece(coordinate+j*Math.abs(possibleMoves[i])/possibleMoves[i]).color != color) {
+									legalMoves.add(possibleMoves[i]);
+								}
+								break;
 							}
 						}
 						if (empty) {
@@ -103,7 +107,6 @@ public class Piece {
 						if (i < 14) {
 							delta = 9 * Math.abs(possibleMoves[i])/possibleMoves[i];
 						} else {
-							System.out.println("delta changed");
 							delta = 7 * Math.abs(possibleMoves[i])/possibleMoves[i];
 						}
 						for(int j = 1; j < Math.abs(co_x_board(coordinate)-co_x_board(coordinate+possibleMoves[i]))+1; j++) {
@@ -118,7 +121,6 @@ public class Piece {
 						if (empty) {
 							legalMoves.add(possibleMoves[i]);
 						}
-						System.out.println();
 					}
 				} else if (constraints[i] == 5) {
 					if (co_x_board(coordinate) == co_x_board(coordinate+possibleMoves[i])) {
@@ -137,12 +139,14 @@ public class Piece {
 						}
 					}
 				} else if (constraints[i] == 6) {
-					if (ChessBoard.getPiece(coordinate+possibleMoves[i]) == null) {
-						legalMoves.add(possibleMoves[i]);
-					} else if (ChessBoard.getPiece(coordinate+possibleMoves[i]).color != color) {
-						legalMoves.add(possibleMoves[i]);
+					if (Math.abs(co_x_board(coordinate)-co_x_board(coordinate+possibleMoves[i])) <= 2 && Math.abs(co_y_board(coordinate)-co_y_board(coordinate+possibleMoves[i])) <= 2) {
+						if (ChessBoard.getPiece(coordinate+possibleMoves[i]) == null) {
+							legalMoves.add(possibleMoves[i]);
+						} else if (ChessBoard.getPiece(coordinate+possibleMoves[i]).color != color) {
+							legalMoves.add(possibleMoves[i]);
+						}
 					}
-				}
+				}				
 			}
 		}
 		return legalMoves;
