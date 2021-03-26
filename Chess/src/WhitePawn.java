@@ -15,8 +15,8 @@ public class WhitePawn extends Piece {
 	static int[] possibleMoves	=	{7, 8, 9, 16};
 	static int[] constraints	=	{1, 0, 1, 5};
 	
-	public WhitePawn(String color, int coordinate) {
-		super(color, coordinate, possibleMoves, constraints);
+	public WhitePawn(String color, int coordinate, ChessBoard chessboard) {
+		super(color, coordinate, possibleMoves, constraints, chessboard);
 		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_pawn.png");
 	}
 }

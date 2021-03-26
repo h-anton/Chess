@@ -45,34 +45,39 @@ public class ChessBoard extends JPanel {
 									1,	9,	17,	25,	33,	41,	49,	57,
 									0,	8,	16,	24,	32,	40,	48,	56};
 	
-	ArrayList<Square> squares = new ArrayList<Square>();
-	static ArrayList<Piece> white_pieces = new ArrayList<Piece>();
-	static ArrayList<Piece> black_pieces = new ArrayList<Piece>();
+	ArrayList<Square> squares;
+	ArrayList<Piece> white_pieces;
+	ArrayList<Piece> black_pieces;
 		
 	
 	public ChessBoard() {
+		
+		squares = new ArrayList<Square>();
+		white_pieces = new ArrayList<Piece>();
+		black_pieces = new ArrayList<Piece>();
+		
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
-				squares.add(new Square(i, j));
+				squares.add(new Square(i, j, this));
 			}
 		}
 		
 		for (int i = 0; i < 8; i++) {
-			white_pieces.add(new WhitePawn	("white",	8+i));
-			black_pieces.add(new BlackPawn	("black",	48+i));
+			white_pieces.add(new WhitePawn	("white",	8+i,	this));
+			black_pieces.add(new BlackPawn	("black",	48+i,	this));
 		}
 		for (int i = 0; i < 2; i++) {
-			white_pieces.add(new Rook	("white",	7*i));
-			white_pieces.add(new Bishop	("white",	2+3*i));
-			white_pieces.add(new Knight	("white",	1+5*i));
-			black_pieces.add(new Rook	("black",	56+7*i));
-			black_pieces.add(new Knight	("black",	57+5*i));
-			black_pieces.add(new Bishop	("black",	58+3*i));
+			white_pieces.add(new Rook	("white",	7*i,		this));
+			white_pieces.add(new Bishop	("white",	2+3*i,		this));
+			white_pieces.add(new Knight	("white",	1+5*i,		this));
+			black_pieces.add(new Rook	("black",	56+7*i,		this));
+			black_pieces.add(new Knight	("black",	57+5*i,		this));
+			black_pieces.add(new Bishop	("black",	58+3*i,		this));
 		}
-		white_pieces.add(new Queen	("white",	3));
-		white_pieces.add(new King	("white",	4));
-		black_pieces.add(new Queen	("black",	59));
-		black_pieces.add(new King	("black",	60));
+		white_pieces.add(new Queen	("white",	3,		this));
+		white_pieces.add(new King	("white",	4,		this));
+		black_pieces.add(new Queen	("black",	59,		this));
+		black_pieces.add(new King	("black",	60,		this));
 	}
 
 	@Override
@@ -191,15 +196,15 @@ public class ChessBoard extends JPanel {
         f.setVisible(true);
     }
 	
-	public static Dimension screenSize() {
+	public Dimension screenSize() {
 		return Toolkit.getDefaultToolkit().getScreenSize();
 	}
 	
-	public static int squareSize() {
+	public int squareSize() {
 		return (int)screenSize().height/12;
 	}
 	
-	public static Piece getPiece(int coordinate) {
+	public Piece getPiece(int coordinate) {
 		Piece result = null;
 		for (Piece piece : white_pieces) {
 			if (piece.coordinate == coordinate) {
@@ -227,11 +232,11 @@ public class ChessBoard extends JPanel {
 		}
 	}
 	
-	public static int kingCoordinate(String color) {
+	public int kingCoordinate(String color) {
 		if (color == "white") {
-			return ChessBoard.white_pieces.get(-1).coordinate;
+			return white_pieces.get(-1).coordinate;
 		} else {
-			return ChessBoard.black_pieces.get(-1).coordinate;
+			return black_pieces.get(-1).coordinate;
 		}
 	}
 }

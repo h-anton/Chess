@@ -10,11 +10,12 @@ public class Square {
 	
 	//boolean selected = false;
 	
-	public Square(int x, int y) {
+	public Square(int x, int y, ChessBoard chessboard) {
 		// constructor
-		start_x = x*ChessBoard.squareSize();
-		start_y = y*ChessBoard.squareSize();
-		square_size = ChessBoard.squareSize();
+		
+		start_x = x*chessboard.squareSize();
+		start_y = y*chessboard.squareSize();
+		square_size = chessboard.squareSize();
 		if ((x+y)%2 == 0) {
 			// Color of the white squares
 			square_color = new Color(209, 192, 148);

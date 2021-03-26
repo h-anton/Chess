@@ -15,8 +15,8 @@ public class Rook extends Piece {
 	static int[] possibleMoves	=	{-7, -6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, -8, -16, -24, -32, -40, -48, -56, 8, 16, 24, 32, 40, 48, 56};
 	static int[] constraints	=	{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
 	
-	public Rook(String color, int coordinate) {
-		super(color, coordinate, possibleMoves, constraints);
+	public Rook(String color, int coordinate, ChessBoard chessboard) {
+		super(color, coordinate, possibleMoves, constraints, chessboard);
 		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_rook.png");
 	}
 }

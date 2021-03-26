@@ -15,8 +15,8 @@ public class King extends Piece {
 	static int[] possibleMoves	=	{-9, -8, -7, -1, 1, 7, 8, 9};
 	static int[] constraints	=	{6, 6, 6, 6, 6, 6, 6, 6};
 	
-	public King(String color, int coordinate) {
-		super(color, coordinate, possibleMoves, constraints);
+	public King(String color, int coordinate, ChessBoard chessboard) {
+		super(color, coordinate, possibleMoves, constraints, chessboard);
 		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_king.png");
 	}
 }

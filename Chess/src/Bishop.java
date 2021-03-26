@@ -18,8 +18,8 @@ public class Bishop extends Piece {
 									7, 14, 21, 28, 35, 42, 49}; 		// going up and to the left:	index 21 to 27
 	static int[] constraints	=	{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4};
 	
-	public Bishop(String color, int coordinate) {
-		super(color, coordinate, possibleMoves, constraints);
+	public Bishop(String color, int coordinate, ChessBoard chessboard) {
+		super(color, coordinate, possibleMoves, constraints, chessboard);
 		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_bishop.png");
 	}
 	
