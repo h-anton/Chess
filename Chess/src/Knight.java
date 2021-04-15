@@ -18,5 +18,6 @@ public class Knight extends Piece {
 	public Knight(String color, int coordinate, ChessBoard chessboard) {
 		super(color, coordinate, possibleMoves, constraints, chessboard);
 		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_knight.png");
+		super.isGhost = false;
 	}
 }

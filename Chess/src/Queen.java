@@ -22,5 +22,6 @@ public class Queen extends Piece {
 	public Queen(String color, int coordinate, ChessBoard chessboard) {
 		super(color, coordinate, possibleMoves, constraints, chessboard);
 		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_queen.png");
+		super.isGhost = false;
 	}
 }

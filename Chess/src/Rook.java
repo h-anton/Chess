@@ -18,5 +18,6 @@ public class Rook extends Piece {
 	public Rook(String color, int coordinate, ChessBoard chessboard) {
 		super(color, coordinate, possibleMoves, constraints, chessboard);
 		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_rook.png");
+		super.isGhost = false;
 	}
 }

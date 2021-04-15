@@ -8,16 +8,6 @@ import java.util.*;
 
 import javax.swing.*;
 
-/*	XMPP Domain name: DESKTOP-U9BO5EO.lan
- * 	Server Host Name: DESKTOP-U9BO5EO.lan
- *	Admin console port: 9090
- * 	Secure Admin console port: 9091
- * 
- * 	Database Driver Presets: Microsoft SQL Server (legacy)
- * 	JDBC Driver Class:	net.sourceforge.jtds.jdbc.Driver
- * 	Database URL:	jdbc:jtds:sqlserver://HOSTNAME/DATABASENAME;appName=Openfire
- */
-
 @SuppressWarnings("serial")
 public class ChessBoard extends JPanel {
 	String[][] chess_coordinates = {	{"A8", "A7", "A6", "A5", "A4", "A3", "A2", "A1"},
@@ -107,8 +97,7 @@ public class ChessBoard extends JPanel {
 	}
 	
 	public void showLegalMoves(Piece piece) {
-		//System.out.println("legal moves: " + piece.legalMoves().toString());
-		for (int legalMove : piece.legalMoves()) {
+		for (int legalMove : getLegalMoves(piece)) {
 			squares.get(draw_coordinates[piece.coordinate+legalMove]).color = squares.get(draw_coordinates[piece.coordinate+legalMove]).possibleMoves_color;
 		}
 	}
@@ -131,8 +120,11 @@ public class ChessBoard extends JPanel {
 		f.addMouseListener(new MouseListener() {
 			int selected_square = -1;
 			int new_selection = -1;
-			int x_coordinate, y_coordinate;
+			int x_coordinate, y_coordinate, new_x, new_y;
+			ArrayList<Integer> legalMoves = new ArrayList<Integer>();
 			String turn = "white";
+			Iterator<Piece> itr1 = white_pieces.iterator();
+			Iterator<Piece> itr2 = black_pieces.iterator();
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
@@ -147,7 +139,7 @@ public class ChessBoard extends JPanel {
 				new_selection = list_coordinates[x_coordinate][y_coordinate];
 
 				if (getPiece(new_selection) != null && selected_square == -1) { // select a piece
-					if (!getPiece(new_selection).legalMoves().isEmpty()) {
+					if (!getLegalMoves(getPiece(new_selection)).isEmpty()) {
 						if (getPiece(new_selection).color == turn) {
 							selected_square = new_selection;
 							System.out.println("Mouse pressed: chess coordinates = " + chess_coordinates[x_coordinate][y_coordinate] + "   list coordinates = " + String.valueOf(selected_square));
@@ -155,15 +147,70 @@ public class ChessBoard extends JPanel {
 							showLegalMoves(getPiece(selected_square));
 						}
 					}
-					
 				} else if (selected_square != -1) { // move a piece
-					if (getPiece(selected_square).legalMoves().contains(new_selection-selected_square)) {
-						if (getPiece(new_selection) != null && getPiece(selected_square).color != getPiece(new_selection).color) { // taking a piece
-							//getPiece(new_selection).isAlive = false;
+					legalMoves = getLegalMoves(getPiece(selected_square));
+					if (legalMoves.contains(new_selection-selected_square)) {
+						if (getPiece(new_selection) != null) { // taking a piece
+							if (getPiece(new_selection).getClass().getName() == "GhostEnPassant") {
+								deletePiece(getPiece(new_selection).ghostCoordinate);
+							}
 							deletePiece(new_selection);
 						}
 						getPiece(selected_square).move(new_selection);
 						getPiece(new_selection).hasMoved = true;
+						
+						// En passant
+						itr1 = white_pieces.iterator();
+						while (itr1.hasNext()) {
+							Piece piece = itr1.next();
+							if (piece.getClass().getName() == "GhostEnPassant") {
+								getPiece(piece.ghostCoordinate).hasGhost = false;
+								itr1.remove();
+							}
+						} 
+						itr2 = black_pieces.iterator();
+						while (itr2.hasNext()) {
+							Piece piece = itr2.next();
+							if (piece.getClass().getName() == "GhostEnPassant") {
+								getPiece(piece.ghostCoordinate).hasGhost = false;
+								itr2.remove();
+							}
+						} 
+
+						
+						if (getPiece(new_selection).getClass().getName().contains("Pawn")) {
+							if (Math.abs(new_selection-selected_square) == 16) {
+								getPiece(new_selection).hasGhost = true;
+								System.out.println("ghost created");
+								createGhostEnPassant(getPiece(new_selection));
+							} else if (getPiece(new_selection).hasGhost) {
+								deletePiece(getPiece(new_selection).ghostCoordinate);
+								getPiece(new_selection).hasGhost = false;
+							}
+						}
+						
+						// Castling
+						if (getPiece(new_selection).getClass().getName() == "King") {
+							if (Math.abs(new_selection-selected_square) == 2) {
+								if (new_selection == 2) {
+									getPiece(0).move(getPiece(0).coordinate+3);
+								} else if (new_selection == 6) {
+									getPiece(7).move(getPiece(7).coordinate-2);
+								} else if (new_selection == 58) {
+									getPiece(56).move(getPiece(56).coordinate+3);
+								} else {
+									getPiece(63).move(getPiece(63).coordinate-2);
+								}
+							}
+						}
+						
+						// Promoting of pawns
+						if (getPiece(new_selection).getClass().getName().contains("Pawn")) { // if a pawn has been moved
+							if (new_selection < 8 || new_selection > 55) {
+								promote(new_selection);
+							}
+						}
+						
 						changeColor(draw_coordinates[selected_square]);
 						changeColor(draw_coordinates[new_selection]);
 						selected_square = -1;
@@ -180,6 +227,11 @@ public class ChessBoard extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				// TODO Auto-generated method stub
+				new_x = (int)e.getX()/squareSize();
+				new_y = (int)(e.getY()-title_offset)/squareSize();
+				if (new_x != x_coordinate || new_y != y_coordinate) {
+					System.out.println("drag and drop");
+				}
 			}
 
 			@Override
@@ -233,10 +285,96 @@ public class ChessBoard extends JPanel {
 	}
 	
 	public int kingCoordinate(String color) {
+		int kingCoordinate = 0;
 		if (color == "white") {
-			return white_pieces.get(-1).coordinate;
+			for (Piece piece : white_pieces) {
+				if (getPiece(piece.coordinate).getClass().getName() == "King") {
+					kingCoordinate = piece.coordinate;
+				}
+			}
 		} else {
-			return black_pieces.get(-1).coordinate;
+			for (Piece piece : black_pieces) {
+				if (getPiece(piece.coordinate).getClass().getName() == "King") {
+					kingCoordinate = piece.coordinate;
+				}
+			}
+		}
+		return kingCoordinate;
+	}
+	
+	public void promote(int coordinate) {
+		for (int i = 0; i < white_pieces.size(); i++) {
+			if (white_pieces.get(i).coordinate == coordinate) {
+				white_pieces.add(new Queen("white", coordinate, this));
+				white_pieces.remove(i);
+			}
+		}
+		for (int i = 0; i < black_pieces.size(); i++) {
+			if (black_pieces.get(i).coordinate == coordinate) {
+				black_pieces.add(new Queen("black", coordinate, this));
+				black_pieces.remove(i);
+			}
+		}
+	}
+	
+	public ArrayList<Piece> opponentPieces(String color) {
+		if (color == "white") {
+			return black_pieces;
+		} else {
+			return white_pieces;
+		}
+	}
+	
+	public boolean kingChecked(String color) {
+		boolean result = false;
+		for (Piece piece : opponentPieces(color)) {
+			for (int move : piece.legalMoves()) {
+				if (kingCoordinate(color) == piece.coordinate+move) {
+					result = true;
+				}
+			}
+		}
+		return result;
+	}
+	
+	public Piece kingCheckedBy(String color) {
+		Piece result = null;
+		for (Piece piece : opponentPieces(color)) {
+			for (int move : piece.legalMoves()) {
+				if (kingCoordinate(color) == piece.coordinate+move) {
+					result = piece;
+				}
+			}
+		}
+		return result;
+	}
+	
+	public ArrayList<Integer> getLegalMoves(Piece piece) {
+		int coordinate = piece.coordinate;
+		ArrayList<Integer> legalMoves = piece.legalMoves();
+		ArrayList<Integer> illegalMoves = new ArrayList<Integer>();
+
+		for (int move : legalMoves) {
+			piece.move(coordinate + move);
+			if (kingChecked(piece.color) && kingCheckedBy(piece.color).coordinate != piece.coordinate) {
+				illegalMoves.add(move);
+			}
+			piece.move(coordinate);
+		}
+		
+		legalMoves.removeAll(illegalMoves);
+		return legalMoves;
+	}
+	
+	public void createGhostEnPassant(Piece piece) {
+		if (piece.color == "white") {
+			piece.ghostCoordinate = piece.coordinate - 8;
+			white_pieces.add(new GhostEnPassant("white", piece.coordinate-8, this));
+			getPiece(piece.coordinate-8).ghostCoordinate = piece.coordinate;
+		} else {
+			black_pieces.add(new GhostEnPassant("black", piece.coordinate+8, this));
+			piece.ghostCoordinate = piece.coordinate + 8;
+			getPiece(piece.coordinate+8).ghostCoordinate = piece.coordinate;
 		}
 	}
 }
