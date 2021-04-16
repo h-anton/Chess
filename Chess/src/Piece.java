@@ -64,7 +64,7 @@ public class Piece {
 	public ArrayList<Integer> legalMoves() {
 		ArrayList<Integer> legalMoves = new ArrayList<Integer>();
 		for(int i = 0; i < possibleMoves.length; i++) {
-			if (coordinate + possibleMoves[i] > 0 && coordinate+possibleMoves[i] < 64) { // moves should remain inside the chessboard
+			if (coordinate + possibleMoves[i] >= 0 && coordinate+possibleMoves[i] < 64) { // moves should remain inside the chessboard
 				// CONSTRAINT 0
 				if (constraints[i] == 0) {
 					if (chessboard.getPiece(coordinate+possibleMoves[i]) == null) { // if there is no piece on the possibleMove

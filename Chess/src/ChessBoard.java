@@ -34,7 +34,7 @@ public class ChessBoard extends JPanel {
 									2,	10,	18,	26,	34,	42,	50,	58,
 									1,	9,	17,	25,	33,	41,	49,	57,
 									0,	8,	16,	24,	32,	40,	48,	56};
-	
+		
 	ArrayList<Square> squares;
 	ArrayList<Piece> white_pieces;
 	ArrayList<Piece> black_pieces;
@@ -121,6 +121,9 @@ public class ChessBoard extends JPanel {
 			int selected_square = -1;
 			int new_selection = -1;
 			int x_coordinate, y_coordinate, new_x, new_y;
+			ArrayList<int[]> boardHistory = new ArrayList<int[]>();
+			int[] boardState = new int[64];
+			int frequency, draw_count;
 			ArrayList<Integer> legalMoves = new ArrayList<Integer>();
 			String turn = "white";
 			Iterator<Piece> itr1 = white_pieces.iterator();
@@ -181,7 +184,6 @@ public class ChessBoard extends JPanel {
 						if (getPiece(new_selection).getClass().getName().contains("Pawn")) {
 							if (Math.abs(new_selection-selected_square) == 16) {
 								getPiece(new_selection).hasGhost = true;
-								System.out.println("ghost created");
 								createGhostEnPassant(getPiece(new_selection));
 							} else if (getPiece(new_selection).hasGhost) {
 								deletePiece(getPiece(new_selection).ghostCoordinate);
@@ -209,6 +211,58 @@ public class ChessBoard extends JPanel {
 							if (new_selection < 8 || new_selection > 55) {
 								promote(new_selection);
 							}
+						}
+						
+						// draw by threefold repetition
+						Arrays.fill(boardState, 0);
+						for (Piece piece : white_pieces) {
+							if (piece.getClass().getName() == "WhitePawn") {
+								boardState[piece.coordinate] = 7;
+							} else if (piece.getClass().getName() == "Knight") {
+								boardState[piece.coordinate] = 2;
+							} else if (piece.getClass().getName() == "Bishop") {
+								boardState[piece.coordinate] = 3;
+							} else if (piece.getClass().getName() == "Rook") {
+								boardState[piece.coordinate] = 8;
+							} else if (piece.getClass().getName() == "Queen") {
+								boardState[piece.coordinate] = 9;
+							} else if (piece.getClass().getName() == "King") {
+								boardState[piece.coordinate] = 1;
+							}
+						}
+						for (Piece piece : black_pieces) {
+							if (piece.getClass().getName() == "BlackPawn") {
+								boardState[piece.coordinate] = -7;
+							} else if (piece.getClass().getName() == "Knight") {
+								boardState[piece.coordinate] = -2;
+							} else if (piece.getClass().getName() == "Bishop") {
+								boardState[piece.coordinate] = -3;
+							} else if (piece.getClass().getName() == "Rook") {
+								boardState[piece.coordinate] = -8;
+							} else if (piece.getClass().getName() == "Queen") {
+								boardState[piece.coordinate] = -9;
+							} else if (piece.getClass().getName() == "King") {
+								boardState[piece.coordinate] = -1;
+							}
+						}
+						boardHistory.add(boardState.clone());
+						frequency = 0;
+						for (int[] board_state : boardHistory) {
+							if (Arrays.equals(board_state, boardState)) {
+								frequency += 1;
+							}
+						}
+						if (frequency == 3) {
+							System.out.println("Draw by threefold repetition");
+						}
+						
+						// draw by insufficient material
+						draw_count = 0;
+						for (int element : boardState) {
+							draw_count += Math.abs(element);
+						}
+						if (draw_count <= 8) {
+							System.out.println("Draw by insufficient material");
 						}
 						
 						changeColor(draw_coordinates[selected_square]);
