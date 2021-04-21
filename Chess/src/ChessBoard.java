@@ -38,9 +38,14 @@ public class ChessBoard extends JPanel {
 	ArrayList<Square> squares;
 	ArrayList<Piece> white_pieces;
 	ArrayList<Piece> black_pieces;
+	
+	String player1, player2;
 		
 	
-	public ChessBoard() {
+	public ChessBoard(String first_player, String second_player) {
+		
+		player1 = first_player;
+		player2 = second_player;
 		
 		squares = new ArrayList<Square>();
 		white_pieces = new ArrayList<Piece>();
@@ -101,18 +106,13 @@ public class ChessBoard extends JPanel {
 			squares.get(draw_coordinates[piece.coordinate+legalMove]).color = squares.get(draw_coordinates[piece.coordinate+legalMove]).possibleMoves_color;
 		}
 	}
-
-	public static void main(String[] args) {
-		ChessBoard chessboard = new ChessBoard();
-		chessboard.createFrame();
-	}
 	
 	public void createFrame() {
         JFrame f = new JFrame("ChessBoard");
         f.getContentPane().setPreferredSize(new Dimension(squareSize()*8, squareSize()*8));
 		f.setResizable(false);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setTitle("Chessboard");
+		f.setTitle(player1 + " vs " + player2);
 		f.setLocation((int)(screenSize().width-squareSize()*8)/2, (int)(screenSize().height-squareSize()*8)/2);
 		f.add(this);
 		f.pack();
