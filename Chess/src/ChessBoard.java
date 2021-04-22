@@ -170,7 +170,7 @@ public class ChessBoard extends JPanel {
 								getPiece(piece.ghostCoordinate).hasGhost = false;
 								itr1.remove();
 							}
-						} 
+						}
 						itr2 = black_pieces.iterator();
 						while (itr2.hasNext()) {
 							Piece piece = itr2.next();

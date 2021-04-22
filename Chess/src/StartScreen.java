@@ -31,14 +31,9 @@ public class StartScreen extends JPanel implements ActionListener {
         
     }
 
- 
-
     public static void main(String[] args) {
         StartScreen startscreen = new StartScreen();
         startscreen.createMenu();
-        
-        
-        
     }
     
     public void createMenu()  {
@@ -99,8 +94,6 @@ public class StartScreen extends JPanel implements ActionListener {
     }
     
 
- 
-
     public Dimension screenSize() {
         return Toolkit.getDefaultToolkit().getScreenSize();
     }
@@ -147,4 +140,5 @@ public class StartScreen extends JPanel implements ActionListener {
         ChessBoard chessboard = new ChessBoard(first_player, second_player);
 		chessboard.createFrame();
     }
+
 }
