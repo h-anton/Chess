@@ -3,17 +3,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.Label;
-import java.awt.Panel;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-
- 
-
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -27,6 +19,8 @@ import javax.swing.JTextField;
 @SuppressWarnings("serial")
 public class StartScreen extends JPanel implements ActionListener {
     
+	JFrame f;
+	
     public StartScreen() {
         
     }
@@ -40,7 +34,7 @@ public class StartScreen extends JPanel implements ActionListener {
         
         
         
-        JFrame f = new JFrame("Main Menu");
+        f = new JFrame("Main Menu");
         f.setSize(menuSize(), menuSize());
         f.setResizable(false);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -139,6 +133,9 @@ public class StartScreen extends JPanel implements ActionListener {
         
         ChessBoard chessboard = new ChessBoard(first_player, second_player);
 		chessboard.createFrame();
+		
+		f.dispose();
+		frame.dispose();
     }
 
 }

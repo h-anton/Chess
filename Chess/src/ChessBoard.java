@@ -40,6 +40,8 @@ public class ChessBoard extends JPanel {
 	ArrayList<Piece> black_pieces;
 	
 	String player1, player2;
+	
+	JFrame f;
 		
 	
 	public ChessBoard(String first_player, String second_player) {
@@ -108,7 +110,7 @@ public class ChessBoard extends JPanel {
 	}
 	
 	public void createFrame() {
-        JFrame f = new JFrame("ChessBoard");
+        f = new JFrame("ChessBoard");
         f.getContentPane().setPreferredSize(new Dimension(squareSize()*8, squareSize()*8));
 		f.setResizable(false);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -357,16 +359,17 @@ public class ChessBoard extends JPanel {
 	}
 	
 	public void promote(int coordinate) {
+		new PopupPromoting(getPiece(coordinate).color, coordinate, this);
 		for (int i = 0; i < white_pieces.size(); i++) {
 			if (white_pieces.get(i).coordinate == coordinate) {
-				white_pieces.add(new Queen("white", coordinate, this));
 				white_pieces.remove(i);
+				break;
 			}
 		}
 		for (int i = 0; i < black_pieces.size(); i++) {
 			if (black_pieces.get(i).coordinate == coordinate) {
-				black_pieces.add(new Queen("black", coordinate, this));
 				black_pieces.remove(i);
+				break;
 			}
 		}
 	}
