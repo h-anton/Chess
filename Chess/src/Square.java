@@ -24,11 +24,10 @@ public class Square {
 			square_color = new Color(110, 83, 43);
 		}
 		color = square_color;
-
 	}
 
 	public void draw(Graphics g) {
 		g.setColor(this.color);
-		g.fillRect(this.start_x, this.start_y, square_size, square_size);
+		g.fillRect(this.start_x+3*square_size, this.start_y, square_size, square_size);
 	}
 }

@@ -17,7 +17,7 @@ public class BlackPawn extends Piece {
 	
 	public BlackPawn(String color, int coordinate, ChessBoard chessboard) {
 		super(color, coordinate, possibleMoves, constraints, chessboard);
-		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_pawn.png");
+		super.image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/"+color+"_pawn.png"));
 		super.isGhost = false;
 	}
 }

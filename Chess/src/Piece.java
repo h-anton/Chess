@@ -42,7 +42,7 @@ public class Piece {
 	
 	public void draw(Graphics g, final Component observer) {
 		if (!isGhost) {
-			g.drawImage(image, co_x_draw(), co_y_draw(), piece_size, piece_size, observer);
+			g.drawImage(image, co_x_draw()+3*square_size, co_y_draw(), piece_size, piece_size, observer);
 		}
 	}
 	
@@ -72,9 +72,11 @@ public class Piece {
 					}
 				// CONSTRAINT 1
 				} else if (constraints[i] == 1) {
-					if (chessboard.getPiece(coordinate+possibleMoves[i]) != null) { // if there is a piece on the possibleMove
-						if (chessboard.getPiece(coordinate+possibleMoves[i]).color != color) { // if that piece is from the opponent
-							legalMoves.add(possibleMoves[i]); // add the possible move
+					if (Math.abs(co_y_board(coordinate)-co_y_board(coordinate+possibleMoves[i])) < 2) {
+						if (chessboard.getPiece(coordinate+possibleMoves[i]) != null) { // if there is a piece on the possibleMove
+							if (chessboard.getPiece(coordinate+possibleMoves[i]).color != color) { // if that piece is from the opponent
+								legalMoves.add(possibleMoves[i]); // add the possible move
+							}
 						}
 					}
 				// CONSTRAINT 2

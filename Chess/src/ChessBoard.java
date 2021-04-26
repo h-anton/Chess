@@ -1,10 +1,12 @@
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.*;
+import java.util.Timer;
 
 import javax.swing.*;
 
@@ -39,15 +41,19 @@ public class ChessBoard extends JPanel {
 	ArrayList<Piece> white_pieces;
 	ArrayList<Piece> black_pieces;
 	
-	String player1, player2;
+	String player1, player2, white_player, turn = "none";
+	int timer_1, timer_2;
 	
 	JFrame f;
-		
+	JLabel name1, name2, timer1, timer2;
 	
-	public ChessBoard(String first_player, String second_player) {
+	public ChessBoard(String first_player, String second_player, int timer_player_1, int timer_player_2, String whitePlayer) {
 		
 		player1 = first_player;
 		player2 = second_player;
+		timer_1 = timer_player_1;
+		timer_2 = timer_player_2;
+		white_player = whitePlayer;
 		
 		squares = new ArrayList<Square>();
 		white_pieces = new ArrayList<Piece>();
@@ -111,11 +117,83 @@ public class ChessBoard extends JPanel {
 	
 	public void createFrame() {
         f = new JFrame("ChessBoard");
-        f.getContentPane().setPreferredSize(new Dimension(squareSize()*8, squareSize()*8));
+        this.setLayout(null);
+        // player names
+        name1 = new JLabel(player1);
+        name1.setFont(new Font("Arial", Font.BOLD, 25));
+        name1.setSize(name1.getPreferredSize());
+        name1.setLocation((3*squareSize()-name1.getWidth())/2, name1.getHeight()/2);
+        this.add(name1);
+        name2 = new JLabel(player2);
+        name2.setFont(new Font("Arial", Font.BOLD, 25));
+        name2.setSize(name2.getPreferredSize());
+        name2.setLocation(11*squareSize()+(3*squareSize()-name2.getWidth())/2, name2.getHeight()/2);
+        this.add(name2);
+        
+        timer1 = new JLabel("timer1");
+        if (timer_1 == -1) {
+        	timer1.setText("- : -");
+        } else {
+        	timer1.setText(String.valueOf(timer_1)+":00");
+        	new Timer().schedule(new TimerTask(){
+        		int countdown = timer_1*60;
+        		int minutes, seconds;
+        		@Override
+                public void run() {
+        			if (turn == "white") {
+        				this.countdown=countdown - 1;
+            			minutes = (int)countdown/60;
+            			seconds = countdown%60;
+            			if (seconds < 10) {
+            				timer1.setText(minutes + ":0" + seconds);
+            			} else {
+            				timer1.setText(minutes + ":" + seconds);
+            			}
+        			}
+                 }   
+            },0, 1000);
+        }
+        timer1.setFont(new Font("Arial", Font.BOLD, 25));
+        timer1.setSize(timer1.getPreferredSize());
+        timer1.setLocation((3*squareSize()-timer1.getWidth())/2, name1.getHeight()+name1.getY());
+        this.add(timer1);
+        timer2 = new JLabel("timer2");
+        if (timer_2 == -1) {
+        	timer2.setText("- : -");
+        } else {
+        	timer2.setText(String.valueOf(timer_2)+":00");
+        	new Timer().schedule(new TimerTask(){
+        		int countdown = timer_2*60;
+        		int minutes, seconds;
+        		@Override
+                public void run() {
+        			if (turn == "black") {
+        				this.countdown=countdown - 1;
+            			minutes = (int)countdown/60;
+            			seconds = countdown%60;
+            			if (seconds < 10) {
+            				timer2.setText(minutes + ":0" + seconds);
+            			} else {
+            				timer2.setText(minutes + ":" + seconds);
+            			}
+        			}
+                 }   
+            },0, 1000);
+        }
+        timer2.setFont(new Font("Arial", Font.BOLD, 25));
+        timer2.setSize(timer1.getPreferredSize());
+        timer2.setLocation(11*squareSize()+(3*squareSize()-timer2.getWidth())/2, name2.getHeight()+name2.getY());
+        this.add(timer2);
+        
+        
+        
+        
+        
+        f.getContentPane().setPreferredSize(new Dimension(squareSize()*14, squareSize()*8));
 		f.setResizable(false);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setTitle(player1 + " vs " + player2);
-		f.setLocation((int)(screenSize().width-squareSize()*8)/2, (int)(screenSize().height-squareSize()*8)/2);
+		f.setLocation((int)(screenSize().width-squareSize()*14)/2, (int)(screenSize().height-squareSize()*8)/2);
 		f.add(this);
 		f.pack();
 		int title_offset = f.getSize().height - (squareSize()*8-1);
@@ -127,7 +205,7 @@ public class ChessBoard extends JPanel {
 			int[] boardState = new int[64];
 			int frequency, draw_count;
 			ArrayList<Integer> legalMoves = new ArrayList<Integer>();
-			String turn = "white";
+			//String turn = "white";
 			Iterator<Piece> itr1 = white_pieces.iterator();
 			Iterator<Piece> itr2 = black_pieces.iterator();
 			@Override
@@ -139,9 +217,13 @@ public class ChessBoard extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
-				x_coordinate = (int)e.getX()/squareSize();
+				x_coordinate = (int)(e.getX()-3*squareSize())/squareSize();
 				y_coordinate = (int)(e.getY()-title_offset)/squareSize();
 				new_selection = list_coordinates[x_coordinate][y_coordinate];
+				
+				if (turn == "none") {
+					turn = "white";
+				}
 
 				if (getPiece(new_selection) != null && selected_square == -1) { // select a piece
 					if (!getLegalMoves(getPiece(new_selection)).isEmpty()) {
@@ -286,7 +368,7 @@ public class ChessBoard extends JPanel {
 				new_x = (int)e.getX()/squareSize();
 				new_y = (int)(e.getY()-title_offset)/squareSize();
 				if (new_x != x_coordinate || new_y != y_coordinate) {
-					System.out.println("drag and drop");
+				//	System.out.println("drag and drop");
 				}
 			}
 
@@ -302,6 +384,7 @@ public class ChessBoard extends JPanel {
 		});
         Frame.getFrames();
         f.setVisible(true);
+        f.setLayout(null);
     }
 	
 	public Dimension screenSize() {

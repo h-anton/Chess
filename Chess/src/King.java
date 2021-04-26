@@ -17,7 +17,7 @@ public class King extends Piece {
 	
 	public King(String color, int coordinate, ChessBoard chessboard) {
 		super(color, coordinate, possibleMoves, constraints, chessboard);
-		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_king.png");
+		super.image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/"+color+"_king.png"));
 		super.isGhost = false;
 	}
 }

@@ -20,7 +20,7 @@ public class Bishop extends Piece {
 	
 	public Bishop(String color, int coordinate, ChessBoard chessboard) {
 		super(color, coordinate, possibleMoves, constraints, chessboard);
-		super.image = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_bishop.png");
+		super.image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/"+color+"_bishop.png"));
 		super.isGhost = false;
 	}
 }
