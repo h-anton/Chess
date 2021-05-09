@@ -30,28 +30,22 @@ public class StartScreen extends JPanel implements ActionListener {
 	String[] colorSelection = {"select randomly", "Player 1", "Player 2"};
 	
 	ChessBoard chessboard;
-	
-    /*public StartScreen() {
-        
-    }*/
 
     public static void main(String[] args) {
         StartScreen startscreen = new StartScreen();
         startscreen.createMenu();
     }
     
-    public void createMenu()  {        
+    public void createMenu()  {  
+    	// Create the frame
         f = new JFrame("Main Menu");
-        //f.setSize(menuSize(), menuSize());
         f.setResizable(false);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setTitle("Main Menu");
-        //f.setUndecorated(true);
         f.setLocation((int)(screenSize().width-menuSize())/2, (int)(screenSize().height-menuSize())/2);
         f.add(this);
-        //f.pack();
         
-        //Title
+        // Add the title
         title = new JLabel("Title");
         title.setText("Welcome to our Chess Game");
         title.setFont(new Font("Arial", Font.BOLD, 25));
@@ -59,7 +53,7 @@ public class StartScreen extends JPanel implements ActionListener {
         title.setLocation((menuSize()-title.getWidth())/2, title.getHeight()/2);
         f.add(title);
         
-        //Creators
+        // Add the subtitle
         creators = new JLabel("Creators");
         creators.setText("created by Anton HAES, Tim RODANIM NZUNGU MUZINGA, Âlim LIMAN");
         creators.setFont(new Font("Arial", Font.ITALIC, 10));
@@ -67,7 +61,7 @@ public class StartScreen extends JPanel implements ActionListener {
         creators.setLocation((menuSize()-creators.getWidth())/2, title.getHeight()+title.getY());
         f.add(creators);
         
-        //Name players
+        //Add the player's names
         cmdName1 = new JLabel("cmdName1");
         cmdName1.setText("Please enter Player 1's name:");
         cmdName1.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -88,7 +82,7 @@ public class StartScreen extends JPanel implements ActionListener {
         f.add(cmdName2);
         f.add(name2);
         
-        //Timers
+        // Add the time selections
         cmdTimer1 = new JLabel("cmdTimer1");
         cmdTimer1.setText("Please select the timer for player 1:");
         cmdTimer1.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -111,7 +105,7 @@ public class StartScreen extends JPanel implements ActionListener {
         f.add(cmdTimer2);
         f.add(timer2);
         
-        //Color selection
+        // Add the color selection
         cmdColor = new JLabel("cmdColor");
         cmdColor.setText("Select which player plays the white side:");
         cmdColor.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -124,7 +118,7 @@ public class StartScreen extends JPanel implements ActionListener {
         f.add(color);
         
         
-        //Start button
+        // Add the start button
         startButton = new JButton("START GAME");
         startButton.addActionListener(this);
         startButton.setFont(new Font("Arial", Font.BOLD, 30));
@@ -136,7 +130,7 @@ public class StartScreen extends JPanel implements ActionListener {
         startButton.setFocusable(false);
         f.add(startButton);
         
-        //End button
+        // Add the exit button
         endButton = new JButton("EXIT");
         endButton.addActionListener(this);
         endButton.setFont(new Font("Arial", Font.BOLD,30));
@@ -147,7 +141,7 @@ public class StartScreen extends JPanel implements ActionListener {
         endButton.setFocusable(false);
         f.add(endButton);
         
-        
+        // Finish creating the frame
         f.setSize(menuSize(), endButton.getHeight()*2+endButton.getY());
         Frame.getFrames();
         f.setLayout(null);
@@ -155,16 +149,14 @@ public class StartScreen extends JPanel implements ActionListener {
     }
     
 
+    // A function that returns the screen resolution
     public Dimension screenSize() {
         return Toolkit.getDefaultToolkit().getScreenSize();
     }
     
+    // A function that return what size the menu should be, depending on the screen resolution
     public int menuSize() {
-    	//if (screenSize().height/12*8 < 500) {
-    	//	return 500;
-    	//} else {
-    		return (int)screenSize().height/12*8;
-    	//}
+    	return (int)screenSize().height/12*8;
     }
 
  
@@ -172,34 +164,40 @@ public class StartScreen extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
+    	
+    	// If the action was performed by the start button
     	if (startButton.equals(e.getSource())) {
     		String first_player, second_player, timer_player_1, timer_player_2, white_player;
         	int time1, time2;
+        	
+        	// Get all the settings
         	first_player = name1.getText();
         	second_player = name2.getText();
         	timer_player_1 = timer1.getSelectedItem().toString();
         	timer_player_2 = timer2.getSelectedItem().toString();
         	white_player = color.getSelectedItem().toString();
+        	
+        	// If a setting has been left blank, ask again
         	while (first_player.equals("Name player 1") || first_player.equals("")) {
         		first_player = JOptionPane.showInputDialog("Please enter a valid name for player 1:");
         	}
         	while (second_player.equals("Name player 2") || second_player.equals("")) {
         		second_player = JOptionPane.showInputDialog("Please enter a valid name for player 2:");
         	}
+        	
+        	// Convert the string specifying the time to a number
         	if (timer_player_1.equals("unlimited")) {
         		time1 = -1;
-        	} else if (timer_player_1.charAt(1) == ' ') {
-        		time1 = Integer.parseInt(timer_player_1.substring(0, 1));
         	} else {
-        		time1 = Integer.parseInt(timer_player_1.substring(0, 2));
+        		time1 = Integer.parseInt(timer_player_1.substring(0, timer_player_1.length()-4));
         	}
         	if (timer_player_2.equals("unlimited")) {
         		time2 = -1;
-        	} else if (timer_player_2.charAt(1) == ' ') {
-        		time2 = Integer.parseInt(timer_player_2.substring(0, 1));
         	} else {
-        		time2 = Integer.parseInt(timer_player_2.substring(0, 2));
+        		time2 = Integer.parseInt(timer_player_2.substring(0, timer_player_2.length()-4));
         	}
+        	
+        	// Select the white player and start the game
         	if (white_player.equals("select randomly")) {
         		Random random = new Random();
         		if (random.nextInt(2) == 0) {
@@ -213,11 +211,11 @@ public class StartScreen extends JPanel implements ActionListener {
         	} else {
         		chessboard = new ChessBoard(second_player, first_player, time2, time1, white_player);
         	}
-            
     		chessboard.createFrame();
     		
+    		// Close the startscreen
     		f.dispose();
-    	} else if (endButton.equals(e.getSource())) {
+    	} else if (endButton.equals(e.getSource())) { // If the action was performed by the exit button
     		System.exit(0);
     	}
     	

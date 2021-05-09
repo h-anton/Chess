@@ -24,22 +24,27 @@ public class Piece {
         this.piece_size = (int)chessboard.squareSize()*2/3;
 	}
 	
+	// A function that returns the board (x-)coordinate of a piece
 	public int co_x_board(int coordinate) {
 		return coordinate - ((int)coordinate/8)*8;
 	}
 	
+	// A function that returns the board (y-)coordinate of a piece
 	public int co_y_board(int coordinate) {
 		return (int)coordinate/8;
 	}
 	
+	// A function that returns the drawing (x-)coordinate of a piece
 	public int co_x_draw() {
 		return co_x_board(coordinate)*square_size+((int)square_size/6);
 	}
 	
+	// A function that returns the drawing (y-)coordinate of a piece
 	public int co_y_draw() {
 		return draw_coordinates[co_y_board(coordinate)]*square_size+((int)square_size/6);
 	}
 	
+	// A function to draw the piece on a screen
 	public void draw(Graphics g, final Component observer) {
 		if (!isGhost) {
 			g.drawImage(image, co_x_draw()+3*square_size, co_y_draw(), piece_size, piece_size, observer);
@@ -53,7 +58,7 @@ public class Piece {
 	 ******		CONSTRAINTS		*****
 	 ********************************
 	 * 	0: new coordinate should be empty
-	 * 	1: new coordinate should be taken by other colours piece
+	 * 	1: new coordinate should be taken by other colours piece (only for pawns)
 	 * 	2: all horizontal squares between old and new coordinate should be empty
 	 * 	3: all vertical squares between old and new coordinate should be empty
 	 * 	4: all diagonal squares between old and new coordinate should be empty
@@ -72,7 +77,7 @@ public class Piece {
 					}
 				// CONSTRAINT 1
 				} else if (constraints[i] == 1) {
-					if (Math.abs(co_y_board(coordinate)-co_y_board(coordinate+possibleMoves[i])) < 2) {
+					if (Math.abs(co_x_board(coordinate)-co_x_board(coordinate+possibleMoves[i])) < 2) { // the piece should remain on the same vertical line +/- 1
 						if (chessboard.getPiece(coordinate+possibleMoves[i]) != null) { // if there is a piece on the possibleMove
 							if (chessboard.getPiece(coordinate+possibleMoves[i]).color != color) { // if that piece is from the opponent
 								legalMoves.add(possibleMoves[i]); // add the possible move

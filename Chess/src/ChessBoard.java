@@ -43,6 +43,9 @@ public class ChessBoard extends JPanel {
 	
 	String player1, player2, white_player, turn = "none";
 	int timer_1, timer_2;
+	boolean alive1 = true, alive2 = true;
+	
+	int title_offset;
 	
 	JFrame f;
 	JLabel name1, name2, timer1, timer2;
@@ -59,12 +62,14 @@ public class ChessBoard extends JPanel {
 		white_pieces = new ArrayList<Piece>();
 		black_pieces = new ArrayList<Piece>();
 		
+		// Create 64 squares, representing the chessboard
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				squares.add(new Square(i, j, this));
 			}
 		}
 		
+		// Create all the pieces
 		for (int i = 0; i < 8; i++) {
 			white_pieces.add(new WhitePawn	("white",	8+i,	this));
 			black_pieces.add(new BlackPawn	("black",	48+i,	this));
@@ -85,6 +90,7 @@ public class ChessBoard extends JPanel {
 
 	@Override
 	public void paintComponent(Graphics g) {
+		// Draw the pieces and the squares on the screen
 		super.paintComponent(g);
 		for (Square square : squares) {
 			square.draw(g);
@@ -96,7 +102,8 @@ public class ChessBoard extends JPanel {
 			piece.draw(g, this);
 		}
 	}
-	
+
+	// A function to change the color of the squares, indicating which square has been selected
 	public void changeColor(int coordinate) {
 		if (squares.get(coordinate).color == squares.get(coordinate).click_color) {
 			squares.get(coordinate).color = squares.get(coordinate).square_color;
@@ -109,6 +116,7 @@ public class ChessBoard extends JPanel {
 		}
 	}
 	
+	// A function to change to color of the squares where the selected piece can move to
 	public void showLegalMoves(Piece piece) {
 		for (int legalMove : getLegalMoves(piece)) {
 			squares.get(draw_coordinates[piece.coordinate+legalMove]).color = squares.get(draw_coordinates[piece.coordinate+legalMove]).possibleMoves_color;
@@ -116,9 +124,11 @@ public class ChessBoard extends JPanel {
 	}
 	
 	public void createFrame() {
+		// Create the frame
         f = new JFrame("ChessBoard");
         this.setLayout(null);
-        // player names
+        
+        // Add the player names
         name1 = new JLabel(player1);
         name1.setFont(new Font("Arial", Font.BOLD, 25));
         name1.setSize(name1.getPreferredSize());
@@ -130,24 +140,34 @@ public class ChessBoard extends JPanel {
         name2.setLocation(11*squareSize()+(3*squareSize()-name2.getWidth())/2, name2.getHeight()/2);
         this.add(name2);
         
+        // Add the timers
         timer1 = new JLabel("timer1");
         if (timer_1 == -1) {
         	timer1.setText("- : -");
         } else {
         	timer1.setText(String.valueOf(timer_1)+":00");
         	new Timer().schedule(new TimerTask(){
+        		// Convert minutes to seconds
         		int countdown = timer_1*60;
         		int minutes, seconds;
         		@Override
                 public void run() {
+        			// Count down when the white player is playing
         			if (turn == "white") {
         				this.countdown=countdown - 1;
+        				// Convert seconds to minutes and seconds
             			minutes = (int)countdown/60;
             			seconds = countdown%60;
+            			// Display the time
             			if (seconds < 10) {
             				timer1.setText(minutes + ":0" + seconds);
             			} else {
             				timer1.setText(minutes + ":" + seconds);
+            			}
+            			// Stop the game when the white player has no time left
+            			if (countdown == 0) {
+            				alive1 = false;
+            				endScreen("white", "time");
             			}
         			}
                  }   
@@ -167,14 +187,22 @@ public class ChessBoard extends JPanel {
         		int minutes, seconds;
         		@Override
                 public void run() {
+        			// Count down when the black player is playing
         			if (turn == "black") {
         				this.countdown=countdown - 1;
+        				// Convert seconds to minutes and seconds
             			minutes = (int)countdown/60;
             			seconds = countdown%60;
+            			// Display the time
             			if (seconds < 10) {
             				timer2.setText(minutes + ":0" + seconds);
             			} else {
             				timer2.setText(minutes + ":" + seconds);
+            			}
+            			// Stop the game when the white player has no time left
+            			if (countdown == 0) {
+            				alive2 = false;
+            				endScreen("black", "time");
             			}
         			}
                  }   
@@ -185,10 +213,6 @@ public class ChessBoard extends JPanel {
         timer2.setLocation(11*squareSize()+(3*squareSize()-timer2.getWidth())/2, name2.getHeight()+name2.getY());
         this.add(timer2);
         
-        
-        
-        
-        
         f.getContentPane().setPreferredSize(new Dimension(squareSize()*14, squareSize()*8));
 		f.setResizable(false);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -196,27 +220,24 @@ public class ChessBoard extends JPanel {
 		f.setLocation((int)(screenSize().width-squareSize()*14)/2, (int)(screenSize().height-squareSize()*8)/2);
 		f.add(this);
 		f.pack();
-		int title_offset = f.getSize().height - (squareSize()*8-1);
+		// Calculate the height of to windows's top bar where the close, minimize and expand buttons are located + the title of the window
+		title_offset = f.getSize().height - (squareSize()*8-1);
 		f.addMouseListener(new MouseListener() {
 			int selected_square = -1;
 			int new_selection = -1;
-			int x_coordinate, y_coordinate, new_x, new_y;
+			int x_coordinate, y_coordinate;
 			ArrayList<int[]> boardHistory = new ArrayList<int[]>();
 			int[] boardState = new int[64];
 			int frequency, draw_count;
 			ArrayList<Integer> legalMoves = new ArrayList<Integer>();
-			//String turn = "white";
 			Iterator<Piece> itr1 = white_pieces.iterator();
 			Iterator<Piece> itr2 = black_pieces.iterator();
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
 
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
+				
+				// Get the coordinates of the selected squares
 				x_coordinate = (int)(e.getX()-3*squareSize())/squareSize();
 				y_coordinate = (int)(e.getY()-title_offset)/squareSize();
 				new_selection = list_coordinates[x_coordinate][y_coordinate];
@@ -226,36 +247,37 @@ public class ChessBoard extends JPanel {
 				}
 
 				if (getPiece(new_selection) != null && selected_square == -1) { // select a piece
-					if (!getLegalMoves(getPiece(new_selection)).isEmpty()) {
-						if (getPiece(new_selection).color == turn) {
+					if (!getLegalMoves(getPiece(new_selection)).isEmpty()) { // if the selected square is not empty
+						if (getPiece(new_selection).color == turn) { // if the selected piece has the right color
 							selected_square = new_selection;
-							System.out.println("Mouse pressed: chess coordinates = " + chess_coordinates[x_coordinate][y_coordinate] + "   list coordinates = " + String.valueOf(selected_square));
 							changeColor(draw_coordinates[selected_square]);
 							showLegalMoves(getPiece(selected_square));
 						}
 					}
 				} else if (selected_square != -1) { // move a piece
 					legalMoves = getLegalMoves(getPiece(selected_square));
-					if (legalMoves.contains(new_selection-selected_square)) {
+					if (legalMoves.contains(new_selection-selected_square)) { // if the selected square is a square where the selected piece is allowed to move to
 						if (getPiece(new_selection) != null) { // taking a piece
+							// if the piece has been taken by 'en passant', also remove the actual piece
 							if (getPiece(new_selection).getClass().getName() == "GhostEnPassant") {
 								deletePiece(getPiece(new_selection).ghostCoordinate);
 							}
 							deletePiece(new_selection);
 						}
+						// Move the piece
 						getPiece(selected_square).move(new_selection);
 						getPiece(new_selection).hasMoved = true;
 						
 						// En passant
 						itr1 = white_pieces.iterator();
-						while (itr1.hasNext()) {
+						while (itr1.hasNext()) { // iterate over all white pieces
 							Piece piece = itr1.next();
 							if (piece.getClass().getName() == "GhostEnPassant") {
 								getPiece(piece.ghostCoordinate).hasGhost = false;
-								itr1.remove();
+								itr1.remove(); // remove 'en passant ghost', since 'en passant' can only be done after 1 move
 							}
 						}
-						itr2 = black_pieces.iterator();
+						itr2 = black_pieces.iterator(); // same as for white pieces
 						while (itr2.hasNext()) {
 							Piece piece = itr2.next();
 							if (piece.getClass().getName() == "GhostEnPassant") {
@@ -264,7 +286,7 @@ public class ChessBoard extends JPanel {
 							}
 						} 
 
-						
+						// add 'en passant ghost' if pawm moves 2 squares
 						if (getPiece(new_selection).getClass().getName().contains("Pawn")) {
 							if (Math.abs(new_selection-selected_square) == 16) {
 								getPiece(new_selection).hasGhost = true;
@@ -277,12 +299,13 @@ public class ChessBoard extends JPanel {
 						
 						// Castling
 						if (getPiece(new_selection).getClass().getName() == "King") {
-							if (Math.abs(new_selection-selected_square) == 2) {
+							if (Math.abs(new_selection-selected_square) == 2) { // if the king moves 2 squares, the king is castling
+								// white king
 								if (new_selection == 2) {
 									getPiece(0).move(getPiece(0).coordinate+3);
 								} else if (new_selection == 6) {
 									getPiece(7).move(getPiece(7).coordinate-2);
-								} else if (new_selection == 58) {
+								} else if (new_selection == 58) { // black king 
 									getPiece(56).move(getPiece(56).coordinate+3);
 								} else {
 									getPiece(63).move(getPiece(63).coordinate-2);
@@ -292,13 +315,14 @@ public class ChessBoard extends JPanel {
 						
 						// Promoting of pawns
 						if (getPiece(new_selection).getClass().getName().contains("Pawn")) { // if a pawn has been moved
-							if (new_selection < 8 || new_selection > 55) {
+							if (new_selection < 8 || new_selection > 55) { // if the pawn has reached the end of the board
 								promote(new_selection);
 							}
 						}
 						
 						// draw by threefold repetition
 						Arrays.fill(boardState, 0);
+						// Add the white pieces to the boardState. Each white piece is represented by a positive number.
 						for (Piece piece : white_pieces) {
 							if (piece.getClass().getName() == "WhitePawn") {
 								boardState[piece.coordinate] = 7;
@@ -314,6 +338,7 @@ public class ChessBoard extends JPanel {
 								boardState[piece.coordinate] = 1;
 							}
 						}
+						// Add the black pieces to the boardState. Each black piece is represented by a negative number.
 						for (Piece piece : black_pieces) {
 							if (piece.getClass().getName() == "BlackPawn") {
 								boardState[piece.coordinate] = -7;
@@ -329,24 +354,29 @@ public class ChessBoard extends JPanel {
 								boardState[piece.coordinate] = -1;
 							}
 						}
+						// add the current boardState to the boardHistory
 						boardHistory.add(boardState.clone());
 						frequency = 0;
+						// Count how many times the current boardState appears in boardHistory
 						for (int[] board_state : boardHistory) {
 							if (Arrays.equals(board_state, boardState)) {
 								frequency += 1;
 							}
 						}
+						// if the current boardState appears 3 times in boardHistory, the game is ended
 						if (frequency == 3) {
-							System.out.println("Draw by threefold repetition");
+							endScreen(turn, "repetition");
 						}
 						
 						// draw by insufficient material
 						draw_count = 0;
+						// Make the sum of the elements of boardState
 						for (int element : boardState) {
 							draw_count += Math.abs(element);
 						}
+						// The numbers representing the pieces in boardState have been chosen such that the total sum will always be <=8 when there are not sufficient elements left on the board to make checkmate
 						if (draw_count <= 8) {
-							System.out.println("Draw by insufficient material");
+							endScreen("none", "draw");
 						}
 						
 						changeColor(draw_coordinates[selected_square]);
@@ -358,18 +388,52 @@ public class ChessBoard extends JPanel {
 							turn = "white";
 						}
 					}
+					
+					// check for draw or checkmate
+					if (turn == "white") {
+						alive1 = false;
+						for (Piece piece : white_pieces) {
+							// If one piece has a possible move, white is not checkmate
+							if (piece.possibleMoves.length != 0) {
+								alive1 = true;
+							}
+						}
+					} else {
+						alive2 = false;
+						for (Piece piece : black_pieces) {
+							// If one piece has a possible move, black is not checkmate
+							if (!getLegalMoves(piece).isEmpty()) {
+								alive2 = true;
+							}
+						}
+					}
+					
+					// If player one has no possible moves
+					if (!alive1) {
+						// If his king is checked, it means he is checkmate
+						if (kingChecked("white")) {
+							endScreen("black", "checkmate");
+						} else { // otherwise it means he is stalemate
+							endScreen("black", "stalemate");
+						}
+						
+					}
+					// Same as for player 1
+					if (!alive2) {
+						if (kingChecked("black")) {
+							endScreen("white", "checkmate");
+						} else {
+							endScreen("white", "stalemate");
+						}
+					}
 				}
+				// Update the frame with the changes
 				f.repaint();
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				// TODO Auto-generated method stub
-				new_x = (int)e.getX()/squareSize();
-				new_y = (int)(e.getY()-title_offset)/squareSize();
-				if (new_x != x_coordinate || new_y != y_coordinate) {
-				//	System.out.println("drag and drop");
-				}
 			}
 
 			@Override
@@ -381,20 +445,29 @@ public class ChessBoard extends JPanel {
 			public void mouseExited(MouseEvent e) {
 				// TODO Auto-generated method stub
 			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
         Frame.getFrames();
         f.setVisible(true);
         f.setLayout(null);
     }
 	
+	// A function that returns the screen resolution
 	public Dimension screenSize() {
 		return Toolkit.getDefaultToolkit().getScreenSize();
 	}
 	
+	// A function that return what size one square should be, depending on the screen resolution
 	public int squareSize() {
 		return (int)screenSize().height/12;
 	}
 	
+	// A functions that return the piece on a given coordinate
 	public Piece getPiece(int coordinate) {
 		Piece result = null;
 		for (Piece piece : white_pieces) {
@@ -410,6 +483,7 @@ public class ChessBoard extends JPanel {
 		return result;
 	}
 	
+	// A function that deletes the piece on a given coordinate
 	public void deletePiece(int coordinate) {
 		for (int i = 0; i < white_pieces.size(); i++) {
 			if (white_pieces.get(i).coordinate == coordinate) {
@@ -423,6 +497,7 @@ public class ChessBoard extends JPanel {
 		}
 	}
 	
+	// A function that return the coordinates of the king of a given colour
 	public int kingCoordinate(String color) {
 		int kingCoordinate = 0;
 		if (color == "white") {
@@ -441,8 +516,11 @@ public class ChessBoard extends JPanel {
 		return kingCoordinate;
 	}
 	
+	// A function that promotes a pawn
 	public void promote(int coordinate) {
+		// Create a popup window to let the player choose in what piece his pawn should promote
 		new PopupPromoting(getPiece(coordinate).color, coordinate, this);
+		// remove the pawn
 		for (int i = 0; i < white_pieces.size(); i++) {
 			if (white_pieces.get(i).coordinate == coordinate) {
 				white_pieces.remove(i);
@@ -456,7 +534,8 @@ public class ChessBoard extends JPanel {
 			}
 		}
 	}
-	
+
+	// A function that return all the opponents pieces of a given colour
 	public ArrayList<Piece> opponentPieces(String color) {
 		if (color == "white") {
 			return black_pieces;
@@ -465,6 +544,7 @@ public class ChessBoard extends JPanel {
 		}
 	}
 	
+	// A function that returns if the king of a given colour is checked
 	public boolean kingChecked(String color) {
 		boolean result = false;
 		for (Piece piece : opponentPieces(color)) {
@@ -477,6 +557,7 @@ public class ChessBoard extends JPanel {
 		return result;
 	}
 	
+	// A function that returns the piece by which the king of a given colour is checked
 	public Piece kingCheckedBy(String color) {
 		Piece result = null;
 		for (Piece piece : opponentPieces(color)) {
@@ -489,6 +570,7 @@ public class ChessBoard extends JPanel {
 		return result;
 	}
 	
+	// A function that returns all the legal moves a given piece can make
 	public ArrayList<Integer> getLegalMoves(Piece piece) {
 		int coordinate = piece.coordinate;
 		ArrayList<Integer> legalMoves = piece.legalMoves();
@@ -506,6 +588,7 @@ public class ChessBoard extends JPanel {
 		return legalMoves;
 	}
 	
+	// A function that creates a ghost piece, making the 'en passant' move possible
 	public void createGhostEnPassant(Piece piece) {
 		if (piece.color == "white") {
 			piece.ghostCoordinate = piece.coordinate - 8;
@@ -516,5 +599,35 @@ public class ChessBoard extends JPanel {
 			piece.ghostCoordinate = piece.coordinate + 8;
 			getPiece(piece.coordinate+8).ghostCoordinate = piece.coordinate;
 		}
+	}
+	
+	// A function to make the endScreen
+	public void endScreen(String winner_color, String reason) {
+		String message;
+		if (winner_color == "none") {
+			message = "Draw by insufficient material";
+		} else if (winner_color == "white") {
+			if (reason == "time") {
+				message = player1 + " ran out of time";
+			} else if (reason == "checkmate") {
+				message = player1 + " won by checkmate";
+			} else if (reason == "stalemate") {
+				message = "Draw by checkmate";
+			} else {
+				message = player1 + " lost due to threefold repetition";
+			}
+		} else {
+			if (reason == "time") {
+				message = player2 + " ran out of time";
+			} else if (reason == "checkmate") {
+				message = player2 + " won by checkmate";
+			} else if (reason == "stalemate") {
+				message = "Draw by checkmate";
+			} else {
+				message = player2 + " lost due to threefold repetition";
+			}
+		}
+		EndScreen endScreen = new EndScreen(winner_color, reason, message, this);
+		endScreen.createEndScreen();
 	}
 }

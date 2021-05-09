@@ -27,7 +27,8 @@ public class PopupPromoting extends JPanel {
 		f.setResizable(false);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setUndecorated(true);
-		f.setLocation((int)(screenSize().width-squareSize())/2, (int)(screenSize().height-squareSize()*4)/2);
+		//f.setLocation((int)(screenSize().width-squareSize())/2, (int)(screenSize().height-squareSize()*4)/2);
+		f.setLocation(chessboard.f.getLocation().x + chessboard.f.getWidth()/2 - squareSize()/2,chessboard.f.getLocation().y + (chessboard.f.getHeight() + chessboard.title_offset)/2 - 2*squareSize());
 		f.add(this);
 		
 		f.pack();
@@ -109,10 +110,10 @@ public class PopupPromoting extends JPanel {
 	class Images {
 		Image queen, rook, bishop, knight;
 		public Images(String color) {
-			queen = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_queen.png");
-			rook = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_rook.png");
-			bishop = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_bishop.png");
-			knight = Toolkit.getDefaultToolkit().getImage("src/pieces/"+color+"_knight.png");
+			queen = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/"+color+"_queen.png"));
+			rook = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/"+color+"_rook.png"));
+			bishop = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/"+color+"_bishop.png"));
+			knight = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/"+color+"_knight.png"));
 		}
 		public void draw(Graphics g, final Component observer) {
 			g.drawImage(queen, (squareSize()-pieceSize())/2, (squareSize()-pieceSize())/2, pieceSize(), pieceSize(), observer);

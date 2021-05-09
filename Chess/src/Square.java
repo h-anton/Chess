@@ -25,7 +25,8 @@ public class Square {
 		}
 		color = square_color;
 	}
-
+	
+	// A function to draw the squares on the screen
 	public void draw(Graphics g) {
 		g.setColor(this.color);
 		g.fillRect(this.start_x+3*square_size, this.start_y, square_size, square_size);
